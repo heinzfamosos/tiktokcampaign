@@ -23,7 +23,7 @@ if a == 'Instagram':
         sm4, sm5, sm6 = st.columns(3)
         sm7, sm8, sm9 = st.columns(3)
         sm1.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
-        sm2.metric('Social Media Value  Min','$ ' + "{:,}".format(sv['minimum_value']))
+        sm2.metric('Social Media Value  Min','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
         sm3.metric('Social Media Value  Max','$ ' + "{:,}".format(sv['maximum_value']))
         sm4.metric('Social Media Value  Max CPV','$ ' + "{:,}".format(sv['max_val_cpv']))
         sm5.metric('Social Media Value  Max CPL','$ ' + "{:,}".format(sv['max_val_cpl']))
@@ -375,7 +375,7 @@ if a == 'Tiktok':
                 else:
                     new_title = f'<p style="font-family:sans-serif; color:Red; font-size: 42px;">ER MALO</p>'
             st.markdown(new_title, unsafe_allow_html=True)
-            smv = get_socialmedia_value(df['author_follower_count'].mean(),df['video_digg_count'].mean(),df['video_comment_count'].mean(),df['video_share_count'].mean())
+            smv = get_socialmedia_value(df['author_follower_count'].mean()*.1,df['video_digg_count'].median(),df['video_comment_count'].median(),df['video_share_count'].median())
             st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
             smcpv = get_socialvalue_cpv(df['video_play_count'].median())
             st.metric('Social Media Value CPV Min','$ ' + "{:,}".format(round(smcpv['minimum_value'],2)))
@@ -398,6 +398,8 @@ if a == 'Tiktok':
                 engagement = stats['shareCount'] + stats['commentCount'] + stats['diggCount'] + stats['playCount']
                 engagement_rate =  "{:.2f}".format(engagement / authorStats['followerCount']*100)
                 count = count + 1
+                sv = get_socialvalue(stats['playCount'],stats['diggCount'],authorStats['followerCount']*0.1)
+                smv = get_socialmedia_value(authorStats['followerCount']*.2,stats['diggCount'],stats['commentCount'],stats['shareCount'])
                 if count == 1:
                     with colv1:
                         st.video(videoInfo['playAddr'])
@@ -408,8 +410,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 2:
                     with colv2:
                         st.video(videoInfo['playAddr'])
@@ -420,8 +422,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 3:
                     with colv3:
                         st.video(videoInfo['playAddr'])
@@ -432,8 +434,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 4:
                     with colv4:
                         st.video(videoInfo['playAddr'])
@@ -444,8 +446,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 5:
                     with colv5:
                         st.video(videoInfo['playAddr'])
@@ -456,8 +458,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 6:
                     with colv6:
                         st.video(videoInfo['playAddr'])
@@ -468,8 +470,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 7:
                     with colv7:
                         st.video(videoInfo['playAddr'])
@@ -480,8 +482,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 8:
                     with colv8:
                         st.video(videoInfo['playAddr'])
@@ -492,8 +494,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 9:
                     with colv9:
                         st.video(videoInfo['playAddr'])
@@ -504,8 +506,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 10:
                     with colv10:
                         st.video(videoInfo['playAddr'])
@@ -516,8 +518,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 11:
                     with colv11:
                         st.video(videoInfo['playAddr'])
@@ -528,8 +530,8 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                 if count == 12:
                     with colv12:
                         st.video(videoInfo['playAddr'])
@@ -540,6 +542,6 @@ if a == 'Tiktok':
                         st.write('▶️ ' + "{:,}".format(stats['playCount']))
                         st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
                         st.write('ER ' +engagement_rate + '%')
-                        smv = get_socialmedia_value(authorStats['followerCount'],stats['diggCount'],stats['commentCount'],stats['shareCount'])
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                        st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
 
