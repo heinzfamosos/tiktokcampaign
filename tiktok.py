@@ -88,4 +88,41 @@ def get_socialvalue_cpv(views):
   tiktok_data = json.loads(result_data)
   return tiktok_data
 
+def get_socialvalue_cpl(likes):
+  maximum_value = int(likes)*0.16
+  minimum_value = int(likes)*0.05
+  result_data = json.dumps({
+    "maximum_value": maximum_value,
+    "minimum_value": minimum_value
+  })
+  tiktok_data = json.loads(result_data)
+  return tiktok_data
 
+def get_socialvalue_cpm(impressions):
+  maximum_value = int(impressions)/1000*12
+  minimum_value = int(impressions)/1000*0.16
+  average_value = int(impressions)/1000*6.37
+  result_data = json.dumps({
+    "maximum_value": maximum_value,
+    "minimum_value": minimum_value,
+    "average_value":average_value
+  })
+  tiktok_data = json.loads(result_data)
+  return tiktok_data
+
+def get_socialvalue(views,likes,impressions):
+  cpv = get_socialvalue_cpv(views)
+  cpl = get_socialvalue_cpl(likes)
+  cpm = get_socialvalue_cpm(impressions)
+  result_data = json.dumps({
+    "max_val_cpv": cpv['maximum_value'],
+    "min_val_cpv": cpv['minimum_value'],
+    "max_val_cpl": cpl['maximum_value'],
+    "min_val_cpl": cpl['minimum_value'],
+    "max_val_cpm": cpm['maximum_value'],
+    "min_val_cpm": cpm['minimum_value'],
+    "maximum_value": cpl['maximum_value'] + cpv['maximum_value'] + cpm['maximum_value'],
+    "minimum_value": cpl['minimum_value'] + cpv['minimum_value']+ cpm['minimum_value']
+  })
+  tiktok_data = json.loads(result_data)
+  return tiktok_data

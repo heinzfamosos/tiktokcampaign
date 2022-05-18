@@ -4,7 +4,7 @@ import pandas as pd
 import json
 import datetime 
 
-from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv
+from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue
 
 dict_data_campaign = []
 
@@ -18,11 +18,19 @@ if a == 'Instagram':
     calc_btn = st.button('Calcular SMV')
     if calc_btn:
         smv = get_socialmedia_value(impressions,likes,comments,saved_posts)
-        st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
-        smcpv = get_socialvalue_cpv(likes)
-        st.metric('Social Media Value CPV Min','$ ' + "{:,}".format(smcpv['minimum_value']))
-        st.metric('Social Media Value CPV Max','$ ' + "{:,}".format(smcpv['maximum_value']))
-
+        sv = get_socialvalue(impressions,likes,impressions)
+        sm1,sm2,sm3 = st.columns(3)
+        sm4, sm5, sm6 = st.columns(3)
+        sm7, sm8, sm9 = st.columns(3)
+        sm1.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+        sm2.metric('Social Media Value  Min','$ ' + "{:,}".format(sv['minimum_value']))
+        sm3.metric('Social Media Value  Max','$ ' + "{:,}".format(sv['maximum_value']))
+        sm4.metric('Social Media Value  Max CPV','$ ' + "{:,}".format(sv['max_val_cpv']))
+        sm5.metric('Social Media Value  Max CPL','$ ' + "{:,}".format(sv['max_val_cpl']))
+        sm6.metric('Social Media Value  Max CPM','$ ' + "{:,}".format(sv['max_val_cpm']))
+        sm7.metric('Social Media Value  Min CPV','$ ' + "{:,}".format(sv['min_val_cpv']))
+        sm8.metric('Social Media Value  Min CPL','$ ' + "{:,}".format(sv['min_val_cpl']))
+        sm9.metric('Social Media Value  Min CPM','$ ' + "{:,}".format(sv['min_val_cpm']))
 
 
 if a == 'Tiktok':
