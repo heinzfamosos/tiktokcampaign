@@ -2,16 +2,24 @@ import streamlit as st
 # Import pandas to load the analytics
 import pandas as pd 
 import json
+import datetime 
 
-from tiktok import  get_data
+from tiktok import  get_data, get_username_profile, get_username_posts
 
 dict_data_campaign = []
 
 #Input
 hashtag = st.text_input('Escribe el hashtag de tu campaña', value = "")
 
+colb1, colb2, colb3 = st.columns([1,1,1])
+
+with colb1:
+    hashtag_btn = st.button('Buscar Hashtag')
+with colb2:
+    username_btn = st.button('Buscar Username')
+
 #Boton
-if st.button('Buscar'):
+if hashtag_btn:
     print(hashtag)
     dict_test = get_data(hashtag)
     if 'itemList' not in dict_test:
@@ -282,5 +290,201 @@ if st.button('Buscar'):
                     st.image(dict_authors[j]['avatarMedium'])
                     st.write('por @' + j)
         
+if username_btn:
+    print(hashtag)
+    dict_test = get_username_profile(hashtag)
+    dict_test = dict_test['userInfo']
+    authorStats = dict_test['stats']
+    col1, col2 = st.columns(2)
+    with col1:
+        st.image(dict_test['user']['avatarMedium'])
+        st.write('por @' + hashtag) 
+        st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+        st.write('❤️ ' + "{:,}".format(authorStats['heart']))
+        st.write('videos ' + "{:,}".format(authorStats['videoCount']))
+    dict_posts = get_username_posts(dict_test['user']['secUid'])
+    dict_videos = dict_posts['itemList']
+    for k in dict_videos:
+        stats = k['stats']
+        authorStats = k['authorStats']
+        videoInfo = k['video']
+        date = datetime.datetime.fromtimestamp(k['createTime'])
+        date_str = date.strftime('%Y-%m-%d %H:%M:%S')
+        dict_data= {
+                'tiktok_video_id' : k['video']['id'],
+                'video_digg_count':stats['diggCount'],
+                'video_share_count':stats['shareCount'],
+                'video_comment_count':stats['commentCount'],
+                'video_play_count':stats['playCount'],
+                'author_username':k['author']['uniqueId'],
+                'author_following_count': authorStats['followingCount'],
+                'author_follower_count': authorStats['followerCount'],
+                'author_heart_count': authorStats['heartCount'],
+                'publication_date':date_str
+            }
 
+        dict_data_campaign.append(dict_data)
+        
+    with col2:
+        followers = authorStats['followerCount']
+        df = pd.DataFrame(dict_data_campaign)
+        df['engagement'] = df['video_digg_count'] + df['video_comment_count'] + df['video_share_count'] + df['video_play_count']
+        df['engagement_rate'] = df['engagement'] / df['author_follower_count']
+        st.metric('Avg Video Plays', "{:,}".format(round(df['video_play_count'].mean(),2)))
+        st.metric('Avg Engagement', "{:,}".format(round(df['engagement'].mean(),2)))
+        st.metric('Avg Engagement Rate', "{:.2f}".format(df['engagement_rate'].mean()*100) + "%")
+        st.metric('Medio Engagement Rate', "{:.2f}".format(df['engagement_rate'].median()*100) + "%")
+        if followers > 500000:
+            if df['engagement_rate'].median() > 0.15:
+                new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 42px;">ER EXCELENTE</p>'
+            elif df['engagement_rate'].median() > 0.10:
+                new_title = f'<p style="font-family:sans-serif; color:Gray; font-size: 42px;">ER PROMEDIO</p>'
+            else:
+                new_title = f'<p style="font-family:sans-serif; color:Red; font-size: 42px;">ER MALO</p>'
+        else:
+            if df['engagement_rate'].median() > 0.20:
+                new_title = f'<p style="font-family:sans-serif; color:Green; font-size: 42px;">ER EXCELENTE</p>'
+            elif df['engagement_rate'].median() > 0.15:
+                new_title = f'<p style="font-family:sans-serif; color:Gray; font-size: 42px;">ER PROMEDIO</p>'
+            else:
+                new_title = f'<p style="font-family:sans-serif; color:Red; font-size: 42px;">ER MALO</p>'
+        st.markdown(new_title, unsafe_allow_html=True)
+    st.title('Las últimas publicaciones')
+    colv1, colv2, colv3, colv4 = st.columns(4)
+    colv5, colv6, colv7, colv8 = st.columns(4)
+    colv9, colv10, colv11, colv12 = st.columns(4)
+    if 'itemList' not in dict_posts:
+        st.write(f'No se encontraron publicaciones con el hashtag {hashtag}')
+    else:
+        dict_videos = dict_posts['itemList']
+        count = 0
+        for k in dict_videos:
+            stats = k['stats']
+            authorStats = k['authorStats']
+            videoInfo = k['video']
+            date = datetime.datetime.fromtimestamp(k['createTime'])
+            date = date.strftime('%Y-%m-%d %H:%M:%S')
+            engagement = stats['shareCount'] + stats['commentCount'] + stats['diggCount'] + stats['playCount']
+            engagement_rate =  "{:.2f}".format(engagement / authorStats['followerCount']*100)
+            count = count + 1
+            if count == 1:
+                with colv1:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 2:
+                with colv2:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 3:
+                with colv3:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 4:
+                with colv4:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 5:
+                with colv5:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 6:
+                with colv6:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 7:
+                with colv7:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 8:
+                with colv8:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 9:
+                with colv9:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 10:
+                with colv10:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 11:
+                with colv11:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
+            if count == 12:
+                with colv12:
+                    st.video(videoInfo['playAddr'])
+                    st.write('Fecha Publicación: ' + date)
+                    st.write('por @' + k['author']['uniqueId'])
+                    st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                    st.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                    st.write('▶️ ' + "{:,}".format(stats['playCount']))
+                    st.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    st.write('ER ' +engagement_rate + '%')
 
