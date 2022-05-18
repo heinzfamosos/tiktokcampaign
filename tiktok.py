@@ -58,3 +58,34 @@ def get_username_posts(secUid):
     json_string = data.decode("utf-8")
     tiktok_data = json.loads(json_string)
     return tiktok_data
+
+def get_socialmedia_value(reach, likes, comments, shares):
+  conn = http.client.HTTPSConnection("api.socialmediavalue.io")
+  payload = json.dumps({
+    "impressions": int(reach),
+    "likes": int(likes),
+    "comments": int(comments),
+    "savedPosts": int(shares)
+  })
+  headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+  conn.request("POST", "/instagram", payload, headers)
+  res = conn.getresponse()
+  data = res.read()
+  json_string = data.decode("utf-8")
+  tiktok_data = json.loads(json_string)
+  return tiktok_data
+
+def get_socialvalue_cpv(views):
+  maximum_value = int(views)*0.15
+  minimum_value = int(views)*0.01
+  result_data = json.dumps({
+    "maximum_value": maximum_value,
+    "minimum_value": minimum_value
+  })
+  tiktok_data = json.loads(result_data)
+  return tiktok_data
+
+
