@@ -88,7 +88,7 @@ if a == 'Tiktok':
             met7.metric('Engagement', "{:,}".format(campaign_engagement))
             met8.metric('Engagement Rate', campaign_engagement_rate + '%')
             smv = get_socialmedia_value(df['author_follower_count'].sum()*.05,df['video_digg_count'].sum(),df['video_comment_count'].sum(),0)
-            sv = get_socialvalue(df['video_play_count'].sum(),df['video_digg_count'].sum(),df['author_follower_count'].sum()*.2)
+            sv = get_socialvalue(df['video_play_count'].sum(),df['video_digg_count'].sum(),df['author_follower_count'].sum()*.08)
             met9.metric('Expected Cost CPM','$ ' + "{:,}".format(round(sv['avg_val_cpm'],2)))
             met10.metric('Expected Cost CPV','$ ' + "{:,}".format(round(sv['min_val_cpv'],2)))
             met11.metric('Expected Cost SMV','$ ' + "{:,}".format(round(smv['result'],2)))
