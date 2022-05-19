@@ -363,6 +363,7 @@ if a == 'Tiktok':
         dict_test = get_username_profile(hashtag)
         dict_test = dict_test['userInfo']
         secUid = dict_test['user']['secUid']
+        is_verified = dict_test['user']['verified']
         authorStats = dict_test['stats']
         col1, col2 = st.columns(2)
         with col1:
@@ -371,6 +372,7 @@ if a == 'Tiktok':
             st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
             st.write('❤️ ' + "{:,}".format(authorStats['heart']))
             st.write('videos ' + "{:,}".format(authorStats['videoCount']))
+            st.metric('Verificado?', is_verified)
         dict_posts = get_username_posts(secUid)
         dict_videos = dict_posts['itemList']
         for k in dict_videos:
@@ -434,7 +436,8 @@ if a == 'Tiktok':
                 'median_engagement_rate': df['engagement_rate'].median(),
                 'social_media_value_cpv': round(smcpv['minimum_value'],2),
                 'social_media_value':round(smv['result'],2),
-                'tiktok_secUid': secUid
+                'tiktok_secUid': secUid,
+                'is_verified': is_verified
             }
             test = post_data(dict_data)
         st.title('Las últimas publicaciones')
