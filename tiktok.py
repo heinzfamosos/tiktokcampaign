@@ -15,6 +15,18 @@ print(response.text)
 
 import http.client
 import json 
+import numpy
+ 
+ 
+class NpEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, numpy.integer):
+            return int(obj)
+        if isinstance(obj, numpy.floating):
+            return float(obj)
+        if isinstance(obj, numpy.ndarray):
+            return obj.tolist()
+        return super(NpEncoder, self).default(obj)
 
 
 def get_data(hashtag):
@@ -130,12 +142,26 @@ def get_socialvalue(views,likes,impressions):
 
 def post_data(data):
   conn = http.client.HTTPSConnection("hooks.zapier.com")
-  payload = json.dumps(data)
+  payload = json.dumps(data, cls=NpEncoder)
   headers = {
     'Accept': 'application/json',
     'Content-Type': 'application/json'
   }
   conn.request("POST", "/hooks/catch/7655196/bfterek", payload, headers)
+  res = conn.getresponse()
+  data = res.read()
+  json_string = data.decode("utf-8")
+  tiktok_data = json.loads(json_string)
+  return tiktok_data
+
+def post_data_campaign(data):
+  conn = http.client.HTTPSConnection("hooks.zapier.com")
+  payload = json.dumps(data, cls=NpEncoder)
+  headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+  conn.request("POST", "/hooks/catch/7655196/bfhgb15/", payload, headers)
   res = conn.getresponse()
   data = res.read()
   json_string = data.decode("utf-8")

@@ -4,7 +4,7 @@ import pandas as pd
 import json
 import datetime
 
-from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data
+from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data, post_data_campaign
 
 dict_data_campaign = []
 
@@ -92,6 +92,41 @@ if a == 'Tiktok':
             met9.metric('Expected Cost CPM','$ ' + "{:,}".format(round(sv['avg_val_cpm'],2)))
             met10.metric('Expected Cost CPV','$ ' + "{:,}".format(round(sv['min_val_cpv'],2)))
             met11.metric('Expected Cost SMV','$ ' + "{:,}".format(round(smv['result'],2)))
+
+            dict_data_c = {
+                'campaign_hashtag':hashtag,
+                'tiktokers':int(df['author_username'].nunique()),
+                'tiktok_videos': int(df['tiktok_video_id'].nunique()),
+                'total_video_plays': df['video_play_count'].sum(),
+                'avg_video_plays': df['video_play_count'].mean(),
+                'median_video_plays':df['video_play_count'].median(),
+                'total_video_comments': df['video_comment_count'].sum(),
+                'avg_video_comments': df['video_comment_count'].mean(),
+                'median_video_comments':df['video_comment_count'].median(),
+                'total_video_shares': df['video_share_count'].sum(),
+                'avg_video_shares': df['video_share_count'].mean(),
+                'median_video_shares':df['video_share_count'].median(),
+                'total_video_likes': df['video_digg_count'].sum(),
+                'avg_video_likes': df['video_digg_count'].mean(),
+                'median_video_likes':df['video_digg_count'].median(),
+                'total_followers':df['author_follower_count'].sum(),
+                'avg_followers':df['author_follower_count'].mean(),
+                'median_followers':df['author_follower_count'].median(),
+                'total_engagement':campaign_engagement,
+                'avg_engagement':df['engagement'].mean(),
+                'median_engagement': df['engagement'].median(),
+                'total_engagement_rate': campaign_engagement_rate,
+                'avg_engagement_rate': df['engagement_rate'].mean(),
+                'avg_engagement_rate': df['engagement_rate'].mean(),
+                'median_engagement_rate': df['engagement_rate'].median(),
+                'social_media_value_mv': round(sv['minimum_value'],2),
+                'social_media_value':round(smv['result'],2),
+                'social_media_value_cpm': round(sv['avg_val_cpm'],2),
+                'social_media_value_cpv': round(sv['min_val_cpv'],2),
+                'social_media_value_cpl': round(sv['min_val_cpl'],2),
+            }
+            print(dict_data_c)
+            test = post_data_campaign(dict_data_c)
 
             st.title('Las publicaciones')
             count = 0
@@ -327,6 +362,7 @@ if a == 'Tiktok':
         print(hashtag)
         dict_test = get_username_profile(hashtag)
         dict_test = dict_test['userInfo']
+        secUid = dict_test['user']['secUid']
         authorStats = dict_test['stats']
         col1, col2 = st.columns(2)
         with col1:
@@ -335,7 +371,7 @@ if a == 'Tiktok':
             st.write('Followers ' + "{:,}".format(authorStats['followerCount']))
             st.write('❤️ ' + "{:,}".format(authorStats['heart']))
             st.write('videos ' + "{:,}".format(authorStats['videoCount']))
-        dict_posts = get_username_posts(dict_test['user']['secUid'])
+        dict_posts = get_username_posts(secUid)
         dict_videos = dict_posts['itemList']
         for k in dict_videos:
             stats = k['stats']
@@ -397,7 +433,8 @@ if a == 'Tiktok':
                 'avg_engagement_rate': df['engagement_rate'].mean(),
                 'median_engagement_rate': df['engagement_rate'].median(),
                 'social_media_value_cpv': round(smcpv['minimum_value'],2),
-                'social_media_value':round(smv['result'],2)
+                'social_media_value':round(smv['result'],2),
+                'tiktok_secUid': secUid
             }
             test = post_data(dict_data)
         st.title('Las últimas publicaciones')
