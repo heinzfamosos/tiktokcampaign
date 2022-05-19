@@ -121,6 +121,7 @@ def get_socialvalue(views,likes,impressions):
     "min_val_cpl": cpl['minimum_value'],
     "max_val_cpm": cpm['maximum_value'],
     "min_val_cpm": cpm['minimum_value'],
+    "avg_val_cpm": cpm['average_value'],
     "maximum_value": cpl['maximum_value'] + cpv['maximum_value'] + cpm['maximum_value'],
     "minimum_value": cpl['minimum_value'] + cpv['minimum_value']+ cpm['minimum_value']
   })
