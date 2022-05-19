@@ -78,7 +78,7 @@ if a == 'Tiktok':
             campaign_engagement_rate =  "{:.2f}".format(campaign_engagement / df['author_follower_count'].sum()*100)
             met2, met3, met4, met5 = st.columns(4)
             met1, met6, met7, met8 = st.columns(4)
-            met9, met10= st.columns(2)
+            met9, met10, met11= st.columns(3)
             met2.metric('Views',"{:,}".format(df['video_play_count'].sum()))
             met3.metric('Comments',"{:,}".format(df['video_comment_count'].sum()))
             met4.metric('Shares',"{:,}".format(df['video_share_count'].sum()))
@@ -91,6 +91,7 @@ if a == 'Tiktok':
             sv = get_socialvalue(df['video_play_count'].sum(),df['video_digg_count'].sum(),df['author_follower_count'].sum()*.2)
             met9.metric('Expected Cost CPM','$ ' + "{:,}".format(round(sv['min_val_cpm'],2)))
             met10.metric('Expected Cost CPV','$ ' + "{:,}".format(round(sv['min_val_cpv'],2)))
+            met11.metric('Expected Cost SMV','$ ' + "{:,}".format(round(smv['result'],2)))
 
             st.title('Las publicaciones')
             count = 0
