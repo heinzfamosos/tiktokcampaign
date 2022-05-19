@@ -127,3 +127,17 @@ def get_socialvalue(views,likes,impressions):
   })
   tiktok_data = json.loads(result_data)
   return tiktok_data
+
+def post_data(data):
+  conn = http.client.HTTPSConnection("hooks.zapier.com")
+  payload = json.dumps(data)
+  headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+  conn.request("POST", "/hooks/catch/7655196/bfterek", payload, headers)
+  res = conn.getresponse()
+  data = res.read()
+  json_string = data.decode("utf-8")
+  tiktok_data = json.loads(json_string)
+  return tiktok_data

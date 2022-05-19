@@ -2,9 +2,9 @@ import streamlit as st
 # Import pandas to load the analytics
 import pandas as pd 
 import json
-import datetime 
+import datetime
 
-from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue
+from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data
 
 dict_data_campaign = []
 
@@ -355,7 +355,6 @@ if a == 'Tiktok':
                     'author_heart_count': authorStats['heartCount'],
                     'publication_date':date_str
                 }
-
             dict_data_campaign.append(dict_data)
             
         with col2:
@@ -387,6 +386,20 @@ if a == 'Tiktok':
             smcpv = get_socialvalue_cpv(df['video_play_count'].median())
             st.metric('Social Media Value CPV Min','$ ' + "{:,}".format(round(smcpv['minimum_value'],2)))
             st.metric('Social Media Value CPV Max','$ ' + "{:,}".format(round(smcpv['maximum_value'],2)))
+            dict_data = {
+                'tiktok_username':hashtag,
+                'tiktok_followers':followers,
+                'tiktok_videos': authorStats['videoCount'],
+                'avg_video_plays': df['video_play_count'].mean(),
+                'median_video_plays':df['video_play_count'].median(),
+                'avg_engagement':df['engagement'].mean(),
+                'median_engagement': df['engagement'].median(),
+                'avg_engagement_rate': df['engagement_rate'].mean(),
+                'median_engagement_rate': df['engagement_rate'].median(),
+                'social_media_value_cpv': round(smcpv['minimum_value'],2),
+                'social_media_value':round(smv['result'],2)
+            }
+            test = post_data(dict_data)
         st.title('Las últimas publicaciones')
         colv1, colv2, colv3, colv4 = st.columns(4)
         colv5, colv6, colv7, colv8 = st.columns(4)
