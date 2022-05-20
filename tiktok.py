@@ -91,8 +91,13 @@ def get_socialmedia_value(reach, likes, comments, shares):
   return tiktok_data
 
 def get_socialvalue_cpv(views):
-  maximum_value = int(views)*0.15
-  minimum_value = int(views)*0.01
+  try:
+    maximum_value = int(views)*0.15
+    minimum_value = int(views)*0.01
+  except:
+    maximum_value = 0
+    minimum_value = 0
+
   result_data = json.dumps({
     "maximum_value": maximum_value,
     "minimum_value": minimum_value
