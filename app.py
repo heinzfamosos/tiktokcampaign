@@ -147,7 +147,7 @@ if a == 'Instagram':
                             create_update_task_location(location)
 
                     loc_df = pd.DataFrame(dict_loc_df)
-                    st.map(loc_df)
+                    st.map(loc_df[~loc_df['lat'].isna()])
                     st.write(loc_df)    
                    
             elif search_status == 'unknown':

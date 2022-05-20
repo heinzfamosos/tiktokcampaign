@@ -33,7 +33,7 @@ def get_profile_data_ig(username):
     return response_data
 
 def get_feed_posts_data_ig(username):
-    request_str = base_url + username + "/feed/posts?from_date=2022-03-01&access_token="+access_token
+    request_str = base_url + username + "/feed/posts?from_date=2022-05-01&access_token="+access_token
     conn = http.client.HTTPSConnection("api.data365.co")
     payload = ''
     headers = {}
@@ -42,6 +42,20 @@ def get_feed_posts_data_ig(username):
     data = res.read()
     json_string = data.decode("utf-8")
     response_data = json.loads(json_string)
+
+    if 'data' in response_data:
+        if 'items' in response_data['data']:
+            if len(response_data['data']['items']) < 20:
+                request_str = base_url + username + "/feed/posts?from_date=2022-04-01&access_token="+access_token
+                conn = http.client.HTTPSConnection("api.data365.co")
+                payload = ''
+                headers = {}
+                conn.request("GET", request_str, payload, headers)
+                res = conn.getresponse()
+                data = res.read()
+                json_string = data.decode("utf-8")
+                response_data = json.loads(json_string)
+
     return response_data
 
 
