@@ -44,111 +44,110 @@ if a == 'Instagram':
                     st.metric('Verificado?', profile_data['is_verified'])
                     st.metric('Privado?', profile_data['is_private'])
                 
-                st.title('Metricas')
-                posts_data = posts_data['data']
-                posts = posts_data['items']
-                for post in posts:
-                    dict_post = {
-                        'post_id': post['id'],
-                        'likes': post['likes_count'],
-                        'comments': post['comments_count'],
-                        'video_views': post['video_views_count'],
-                        'created_time': post['created_time'],
-                        'is_video': post['is_video'],
-                        'location_id': post['location_id'],
-                        'media_url': post['attached_media_display_url']
-                    }
-                    dict_posts_df.append(dict_post)
-                df = pd.DataFrame(dict_posts_df)
-                df = df.sort_values(by='created_time', ascending=False)
-                df['engagement'] = df['comments'] + df['likes']
-                df['engagement_rate'] = df['engagement'] / profile_data['followers_count']
-                sm1,sm2,sm3, sm4 = st.columns(4)
-                sm1.metric('Posts', df['post_id'].nunique())
-                sm1.metric('Avg Comments', "{:,}".format(round(df['comments'].mean(),2)))
-                sm1.metric('Avg Likes', "{:,}".format(round(df['likes'].mean(),2 )))
-                sm1.metric('Avg Engagement', "{:,}".format(round(df['engagement'].mean(),2)))
-                sm1.metric('Avg Engagement Rate', "{:,}".format(round(df['engagement_rate'].mean()*100,2))+'%')
-                sm2.metric('Video Posts', df[df['is_video']==True]['post_id'].nunique())
-                sm2.metric('Avg Comments Video', "{:,}".format(round(df[df['is_video']==True]['comments'].mean(),2)))
-                sm2.metric('Avg Likes Video', "{:,}".format(round(df[df['is_video']==True]['likes'].mean(),2 )))
-                sm2.metric('Avg Video View', "{:,}".format(round(df[df['is_video']==True]['video_views'].mean(),2)))
-                sm2.metric('Avg Engagement Rate', "{:,}".format(round(df[df['is_video']==True]['engagement'].sum()*100 / df[df['is_video']==True]['video_views'].sum(),2))+'%')
-                sm3.metric('Image Posts', df[df['is_video']==False]['post_id'].nunique())
-                sm3.metric('Avg Comments Post', "{:,}".format(round(df[df['is_video']==False]['comments'].mean(),2)))
-                sm3.metric('Avg Likes Post', "{:,}".format(round(df[df['is_video']==False]['likes'].mean(),2)))
-                sm3.metric('Avg Engagement', "{:,}".format(round(df[df['is_video']==False]['engagement'].mean(),2)))
-                sm3.metric('Avg Engagement Rate', "{:,}".format(round(df[df['is_video']==False]['engagement_rate'].mean()*100,2))+'%')
-                smv = get_socialmedia_value(profile_data['followers_count']*.3,df['likes'].mean(), df['comments'].mean(),0)
-                sm4.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
-                sv = get_socialvalue(coalesce(df[df['is_video']==True]['video_views'].mean(),0),df['likes'].mean(), profile_data['followers_count']*.3)
-                sm4.metric('Social Media Value  Min CPV','$ ' + "{:,}".format(round(sv['min_val_cpv'],2)))
-                sm4.metric('Social Media Value  Min CPL','$ ' + "{:,}".format(round(sv['min_val_cpl'],2)))
-                sm4.metric('Social Media Value  Min CPM','$ ' + "{:,}".format(round(sv['min_val_cpm'],2)))
-                sm4.metric('Social Media Value  Min','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
-                st.title('Publicaciones')
-                cp1, cp2, cp3, cp4 = st.columns(4)
-                for index, row in df.iterrows():
-                    if index < 12:
-                        response = requests.get(row['media_url'])
-                        if index % 4 == 3:
-                            cp1.image(response.content)
-                            cp1.write('Fecha publicacion: ' + str(row['created_time']) )
-                            cp1.write('Likes: ' + str(row['likes'])  )
-                            cp1.write('Comments: ' + str(row['comments']) )
-                            cp1.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
-                            smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
-                            cp1.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result'])) 
-                        if index % 4 == 2:
-                            cp2.image(response.content)
-                            cp2.write('Fecha publicacion: ' + str(row['created_time']) )
-                            cp2.write('Likes: ' + str(row['likes'])  )
-                            cp2.write('Comments: ' + str(row['comments']) )
-                            cp2.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
-                            smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
-                            cp2.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
-                        if index % 4 == 1:
-                            cp3.image(response.content)
-                            cp3.write('Fecha publicacion: ' + str(row['created_time']) )
-                            cp3.write('Likes: ' + str(row['likes'])  )
-                            cp3.write('Comments: ' + str(row['comments']) )
-                            cp3.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
-                            smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
-                            cp3.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
-                        if index % 4 == 0:
-                            cp4.image(response.content)
-                            cp4.write('Fecha publicacion: ' + str(row['created_time']) )
-                            cp4.write('Likes: ' + str(row['likes'])  )
-                            cp4.write('Comments: ' + str(row['comments']) )
-                            cp4.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
-                            smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
-                            cp4.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
-                            
+                if  profile_data['is_private'] == False:
+                    st.title('Metricas')
+                    posts_data = posts_data['data']
+                    posts = posts_data['items']
+                    for post in posts:
+                        dict_post = {
+                            'post_id': post['id'],
+                            'likes': post['likes_count'],
+                            'comments': post['comments_count'],
+                            'video_views': post['video_views_count'],
+                            'created_time': post['created_time'],
+                            'is_video': post['is_video'],
+                            'location_id': post['location_id'],
+                            'media_url': post['attached_media_display_url']
+                        }
+                        dict_posts_df.append(dict_post)
+                    df = pd.DataFrame(dict_posts_df)
+                    df = df.sort_values(by='created_time', ascending=False)
+                    df['engagement'] = df['comments'] + df['likes']
+                    df['engagement_rate'] = df['engagement'] / profile_data['followers_count']
+                    sm1,sm2,sm3, sm4 = st.columns(4)
+                    sm1.metric('Posts', df['post_id'].nunique())
+                    sm1.metric('Avg Comments', "{:,}".format(round(df['comments'].mean(),2)))
+                    sm1.metric('Avg Likes', "{:,}".format(round(df['likes'].mean(),2 )))
+                    sm1.metric('Avg Engagement', "{:,}".format(round(df['engagement'].mean(),2)))
+                    sm1.metric('Avg Engagement Rate', "{:,}".format(round(df['engagement_rate'].mean()*100,2))+'%')
+                    sm2.metric('Video Posts', df[df['is_video']==True]['post_id'].nunique())
+                    sm2.metric('Avg Comments Video', "{:,}".format(round(df[df['is_video']==True]['comments'].mean(),2)))
+                    sm2.metric('Avg Likes Video', "{:,}".format(round(df[df['is_video']==True]['likes'].mean(),2 )))
+                    sm2.metric('Avg Video View', "{:,}".format(round(df[df['is_video']==True]['video_views'].mean(),2)))
+                    sm2.metric('Avg Engagement Rate', "{:,}".format(round(df[df['is_video']==True]['engagement'].sum()*100 / df[df['is_video']==True]['video_views'].sum(),2))+'%')
+                    sm3.metric('Image Posts', df[df['is_video']==False]['post_id'].nunique())
+                    sm3.metric('Avg Comments Post', "{:,}".format(round(df[df['is_video']==False]['comments'].mean(),2)))
+                    sm3.metric('Avg Likes Post', "{:,}".format(round(df[df['is_video']==False]['likes'].mean(),2)))
+                    sm3.metric('Avg Engagement', "{:,}".format(round(df[df['is_video']==False]['engagement'].mean(),2)))
+                    sm3.metric('Avg Engagement Rate', "{:,}".format(round(df[df['is_video']==False]['engagement_rate'].mean()*100,2))+'%')
+                    smv = get_socialmedia_value(profile_data['followers_count']*.3,df['likes'].mean(), df['comments'].mean(),0)
+                    sm4.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
+                    sv = get_socialvalue(coalesce(df[df['is_video']==True]['video_views'].mean(),0),df['likes'].mean(), profile_data['followers_count']*.3)
+                    sm4.metric('Social Media Value  Min CPV','$ ' + "{:,}".format(round(sv['min_val_cpv'],2)))
+                    sm4.metric('Social Media Value  Min CPL','$ ' + "{:,}".format(round(sv['min_val_cpl'],2)))
+                    sm4.metric('Social Media Value  Min CPM','$ ' + "{:,}".format(round(sv['min_val_cpm'],2)))
+                    sm4.metric('Social Media Value  Min','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                    st.title('Publicaciones')
+                    cp1, cp2, cp3, cp4 = st.columns(4)
+                    for index, row in df.iterrows():
+                        if index < 12:
+                            response = requests.get(row['media_url'])
+                            if index % 4 == 3:
+                                cp1.image(response.content)
+                                cp1.write('Fecha publicacion: ' + str(row['created_time']) )
+                                cp1.write('Likes: ' + str(row['likes'])  )
+                                cp1.write('Comments: ' + str(row['comments']) )
+                                cp1.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
+                                smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
+                                cp1.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result'])) 
+                            if index % 4 == 2:
+                                cp2.image(response.content)
+                                cp2.write('Fecha publicacion: ' + str(row['created_time']) )
+                                cp2.write('Likes: ' + str(row['likes'])  )
+                                cp2.write('Comments: ' + str(row['comments']) )
+                                cp2.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
+                                smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
+                                cp2.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
+                            if index % 4 == 1:
+                                cp3.image(response.content)
+                                cp3.write('Fecha publicacion: ' + str(row['created_time']) )
+                                cp3.write('Likes: ' + str(row['likes'])  )
+                                cp3.write('Comments: ' + str(row['comments']) )
+                                cp3.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
+                                smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
+                                cp3.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
+                            if index % 4 == 0:
+                                cp4.image(response.content)
+                                cp4.write('Fecha publicacion: ' + str(row['created_time']) )
+                                cp4.write('Likes: ' + str(row['likes'])  )
+                                cp4.write('Comments: ' + str(row['comments']) )
+                                cp4.write('Engagement Rate: ' + str(round(row['engagement_rate']*100,2)) + '%')
+                                smv = get_socialmedia_value(profile_data['followers_count']*.3,row['likes'], row['comments'],0)
+                                cp4.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))  
+                                
 
-                        
+                    st.title('Locations')
+                    if df['location_id'].nunique() > 0:
+                        dict_loc_df = []
+                        location_list = df[df['location_id'].isna() == False]['location_id'].unique()
+                        for location in location_list:
+                            loc_data_resp = get_task_update_location_data_ig(location)
+                            loc_search_status = loc_data_resp['data']['status']
+                            if loc_search_status == 'finished':
+                                loc_data = get_location_data_ig(location)
+                                loc_data = loc_data['data']
+                                dict_loc = {
+                                    'location_id': loc_data['id'],
+                                    'lat': loc_data['latitude'],
+                                    'lon': loc_data['longitude']
+                                }
+                                dict_loc_df.append(dict_loc)
+                            elif loc_search_status == 'unknown':
+                                create_update_task_location(location)
 
-                st.title('Locations')
-                if df['location_id'].nunique() > 0:
-                    dict_loc_df = []
-                    location_list = df[df['location_id'].isna() == False]['location_id'].unique()
-                    for location in location_list:
-                        loc_data_resp = get_task_update_location_data_ig(location)
-                        loc_search_status = loc_data_resp['data']['status']
-                        if loc_search_status == 'finished':
-                            loc_data = get_location_data_ig(location)
-                            loc_data = loc_data['data']
-                            dict_loc = {
-                                'location_id': loc_data['id'],
-                                'lat': loc_data['latitude'],
-                                'lon': loc_data['longitude']
-                            }
-                            dict_loc_df.append(dict_loc)
-                        elif loc_search_status == 'unknown':
-                            create_update_task_location(location)
-
-                    loc_df = pd.DataFrame(dict_loc_df)
-                    st.map(loc_df[~loc_df['lat'].isna()])
-                    st.write(loc_df)    
+                        loc_df = pd.DataFrame(dict_loc_df)
+                        st.map(loc_df[~loc_df['lat'].isna()])
+                        st.write(loc_df)    
                    
             elif search_status == 'unknown':
                 create_update_task_ig(username)
