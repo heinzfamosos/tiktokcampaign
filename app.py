@@ -130,30 +130,30 @@ if a == 'Instagram':
                                     
 
                     st.title('Locations')
-                    try:
-                        if df['location_id'].nunique() > 0:
-                            dict_loc_df = []
-                            location_list = df[df['location_id'].isna() == False]['location_id'].unique()
-                            for location in location_list:
-                                loc_data_resp = get_task_update_location_data_ig(location)
-                                loc_search_status = loc_data_resp['data']['status']
-                                if loc_search_status == 'finished':
-                                    loc_data = get_location_data_ig(location)
-                                    loc_data = loc_data['data']
-                                    dict_loc = {
-                                        'location_id': loc_data['id'],
-                                        'lat': loc_data['latitude'],
-                                        'lon': loc_data['longitude']
-                                    }
-                                    dict_loc_df.append(dict_loc)
-                                elif loc_search_status == 'unknown':
-                                    create_update_task_location(location)
+                    if df['location_id'].nunique() > 0:
+                        dict_loc_df = []
+                        location_list = df[df['location_id'].isna() == False]['location_id'].unique()
+                        for location in location_list:
+                            loc_data_resp = get_task_update_location_data_ig(location)
+                            loc_search_status = loc_data_resp['data']['status']
+                            if loc_search_status == 'finished':
+                                loc_data = get_location_data_ig(location)
+                                loc_data = loc_data['data']
+                                dict_loc = {
+                                    'location_id': loc_data['id'],
+                                    'lat': loc_data['latitude'],
+                                    'lon': loc_data['longitude']
+                                }
+                                dict_loc_df.append(dict_loc)
+                            elif loc_search_status == 'unknown':
+                                create_update_task_location(location)
 
-                            loc_df = pd.DataFrame(dict_loc_df)
+                        loc_df = pd.DataFrame(dict_loc_df)
+                        try:
                             st.map(loc_df[~loc_df['lat'].isna()])
                             st.write(loc_df)
-                    except:
-                        continue    
+                        except:
+                            st.write('No locations to show')    
                    
             elif search_status == 'unknown':
                 create_update_task_ig(username)
