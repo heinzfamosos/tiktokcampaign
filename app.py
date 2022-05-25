@@ -607,6 +607,12 @@ if a == 'Tiktok':
                 stats = k['stats']
                 authorStats = k['authorStats']
                 videoInfo = k['video']
+                textInfo = k['textExtra']
+                hashtag_list = []
+                for t in textInfo:
+                    if t['hashtagName'] != "":
+                        hashtag_list.append(t['hashtagName'])
+
                 date = datetime.datetime.fromtimestamp(k['createTime'])
                 date = date.strftime('%Y-%m-%d %H:%M:%S')
                 engagement = stats['shareCount'] + stats['commentCount'] + stats['diggCount'] + stats['playCount']
@@ -626,6 +632,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 2:
                     with colv2:
                         st.video(videoInfo['playAddr'])
@@ -638,6 +645,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 3:
                     with colv3:
                         st.video(videoInfo['playAddr'])
@@ -650,6 +658,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 4:
                     with colv4:
                         st.video(videoInfo['playAddr'])
@@ -662,6 +671,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 5:
                     with colv5:
                         st.video(videoInfo['playAddr'])
@@ -674,6 +684,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 6:
                     with colv6:
                         st.video(videoInfo['playAddr'])
@@ -686,6 +697,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 7:
                     with colv7:
                         st.video(videoInfo['playAddr'])
@@ -698,6 +710,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 8:
                     with colv8:
                         st.video(videoInfo['playAddr'])
@@ -710,6 +723,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 9:
                     with colv9:
                         st.video(videoInfo['playAddr'])
@@ -722,6 +736,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 10:
                     with colv10:
                         st.video(videoInfo['playAddr'])
@@ -734,6 +749,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 11:
                     with colv11:
                         st.video(videoInfo['playAddr'])
@@ -746,6 +762,7 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
                 if count == 12:
                     with colv12:
                         st.video(videoInfo['playAddr'])
@@ -758,4 +775,5 @@ if a == 'Tiktok':
                         st.write('ER ' +engagement_rate + '%')
                         st.metric('Social Media Value IG','$ ' + "{:,}".format(smv['result']))
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
+                        st.write(hashtag_list)
 
