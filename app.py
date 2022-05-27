@@ -604,17 +604,23 @@ if a == 'Tiktok':
             dict_videos = dict_posts['itemList']
             count = 0
             hashtags_user_list = []
+            related_users_list = []
             for k in dict_videos:
                 stats = k['stats']
                 authorStats = k['authorStats']
                 videoInfo = k['video']
-                textInfo = k['textExtra']
+                textInfo = []
+                if 'textExtra' in k:
+                    textInfo = k['textExtra']
                 hashtag_list = []
                 for t in textInfo:
                     if t['hashtagName'] != "":
                         hashtag_list.append(t['hashtagName'])
                         if t['hashtagName'] not in hashtags_user_list:
                             hashtags_user_list.append(t['hashtagName'])
+                    else:
+                        if t['secUid'] not in related_users_list:
+                            related_users_list.append(t['secUid'])
 
                 date = datetime.datetime.fromtimestamp(k['createTime'])
                 date = date.strftime('%Y-%m-%d %H:%M:%S')
@@ -791,6 +797,48 @@ if a == 'Tiktok':
                         st.metric('Social Media Value ','$ ' + "{:,}".format(round(sv['minimum_value'],2)))
                         st.write('Hashtags')
                         st.write(hashtag_list)
-            col1.write('Hashtags')
-            col1.write(hashtags_user_list)
+            st.title('Hashtags')
+            st.write(hashtags_user_list)
+            st.title('Related Users')
+            colu1, colu2, colu3, colu4 = st.columns(4)
+            counter = 0
+            for u in related_users_list:
+                dict_posts_u = get_username_posts(u)
+                if 'itemList' in dict_posts_u:
+                    first_item = dict_posts['itemList'][0]
+                    author = first_item['author']
+                    authorStats = first_item['authorStats']
+                    if counter%4 == 0:
+                        colu1.image(author['avatarMedium'])
+                        colu1.write('por @' + author['uniqueId'])
+                        colu1.write('Nickname ' + author['nickname']) 
+                        colu1.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                        colu1.write('❤️ ' + "{:,}".format(authorStats['heart']))
+                        colu1.write('videos ' + "{:,}".format(authorStats['videoCount']))
+                        colu1.metric('Verificado?', author['verified'])
+                    if counter%4 == 1:
+                        colu2.image(author['avatarMedium'])
+                        colu2.write('por @' + author['uniqueId'])
+                        colu2.write('Nickname ' + author['nickname']) 
+                        colu2.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                        colu2.write('❤️ ' + "{:,}".format(authorStats['heart']))
+                        colu2.write('videos ' + "{:,}".format(authorStats['videoCount']))
+                        colu2.metric('Verificado?', author['verified'])
+                    if counter%4 == 2:
+                        colu3.image(author['avatarMedium'])
+                        colu3.write('por @' + author['uniqueId'])
+                        colu3.write('Nickname ' + author['nickname']) 
+                        colu3.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                        colu3.write('❤️ ' + "{:,}".format(authorStats['heart']))
+                        colu3.write('videos ' + "{:,}".format(authorStats['videoCount']))
+                        colu3.metric('Verificado?', author['verified'])
+                    if counter%4 == 3:
+                        colu4.image(author['avatarMedium'])
+                        colu4.write('por @' + author['uniqueId'])
+                        colu4.write('Nickname ' + author['nickname']) 
+                        colu4.write('Followers ' + "{:,}".format(authorStats['followerCount']))
+                        colu4.write('❤️ ' + "{:,}".format(authorStats['heart']))
+                        colu4.write('videos ' + "{:,}".format(authorStats['videoCount']))
+                        colu4.metric('Verificado?', author['verified'])
+                    
 
