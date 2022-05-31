@@ -4,14 +4,39 @@ import pandas as pd
 import json
 import datetime
 import requests
+from sqlalchemy import create_engine
+
+from creds import username, db_password, host_url
 
 from utils import coalesce
-from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data, post_data_campaign
+from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data, post_data_campaign, get_data_search, get_data_search_users, get_data_search_videos
 from instagram import create_update_task_ig, get_task_update_profile_data_ig, get_profile_data_ig, get_feed_posts_data_ig, create_update_task_location, get_task_update_location_data_ig, get_location_data_ig
 
 dict_data_campaign = []
+usernames_campaign = []
 
-a = st.sidebar.radio('Selecciona una red social:', ['Tiktok', 'Instagram'])
+user = username
+password = db_password
+db = 'analytics'
+host = host_url
+engine = create_engine(
+    f'postgresql://{user}:{password}@{host}/{db}',
+    isolation_level="READ UNCOMMITTED"
+)
+
+query = '''
+SELECT *
+FROM tiktok_influencers
+'''
+
+st.set_page_config(
+     page_title="Famosos Analytics",
+     page_icon="🧊",
+     layout="wide",
+     initial_sidebar_state="expanded"
+ )
+
+a = st.sidebar.radio('Selecciona una opción:', ['Tiktok', 'Instagram', 'Crear Campaña'])
 
 if a == 'Instagram':
 
@@ -197,6 +222,20 @@ if a == 'Tiktok':
         hashtag_btn = st.button('Buscar Hashtag')
     with colb2:
         username_btn = st.button('Buscar Username')
+    with colb3:
+        search_btn = st.button('Buscar Palabras Clave')
+
+    if search_btn:
+        print(hashtag)
+        usernames_campaign.append(hashtag)
+        usernames = st.multiselect(
+                'What are your favorite colors',usernames_campaign)
+        st.title('Search')
+        st.write(get_data_search(hashtag))
+        st.title('Users')
+        st.write(get_data_search_users(hashtag))
+        st.title('Videos')
+        st.write(get_data_search_videos(hashtag))
 
     #Boton
     if hashtag_btn:
@@ -517,7 +556,10 @@ if a == 'Tiktok':
         dict_test = get_username_profile(hashtag)
         dict_test = dict_test['userInfo']
         secUid = dict_test['user']['secUid']
+        nickname = dict_test['user']['nickname']
+        avatar = dict_test['user']['avatarMedium']
         is_verified = dict_test['user']['verified']
+        tiktok_signature = dict_test['user']['signature']
         authorStats = dict_test['stats']
         col1, col2 = st.columns(2)
         with col1:
@@ -581,9 +623,14 @@ if a == 'Tiktok':
             dict_data = {
                 'tiktok_username':hashtag,
                 'tiktok_followers':followers,
+                'tiktok_nickname':nickname,
+                'tiktok_avatar':avatar,
+                'tiktok_signature': tiktok_signature,
                 'tiktok_videos': authorStats['videoCount'],
                 'avg_video_plays': df['video_play_count'].mean(),
                 'median_video_plays':df['video_play_count'].median(),
+                'q1_video_plays':df['video_play_count'].quantile(.25),
+                'q3_video_plays':df['video_play_count'].quantile(.75),
                 'avg_engagement':df['engagement'].mean(),
                 'median_engagement': df['engagement'].median(),
                 'avg_engagement_rate': df['engagement_rate'].mean(),
@@ -841,4 +888,9 @@ if a == 'Tiktok':
                         colu4.write('videos ' + "{:,}".format(authorStats['videoCount']))
                         colu4.metric('Verificado?', author['verified'])
                     
-
+if a == 'Crear Campaña':   
+    results_table = pd.read_sql(query, engine)
+    options = st.multiselect('Selecciona los influencers para tu campaña', results_table['username'])
+    btn_analize = st.button('Analizar')
+    if btn_analize:
+        st.write(options)
