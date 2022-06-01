@@ -36,6 +36,11 @@ st.set_page_config(
      initial_sidebar_state="expanded"
  )
 
+
+html_string = "<img src='https://media.giphy.com/avatars/famososapp/b3uLdDVcZYGf.png' height='100' />"
+
+st.markdown(html_string, unsafe_allow_html=True)
+
 a = st.sidebar.radio('Selecciona una opción:', ['Tiktok', 'Instagram', 'Crear Campaña'])
 
 if a == 'Instagram':
