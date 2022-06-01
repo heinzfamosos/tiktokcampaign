@@ -9,7 +9,7 @@ from sqlalchemy import create_engine
 from creds import username, db_password, host_url
 
 from utils import coalesce
-from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data, post_data_campaign, get_data_search, get_data_search_users, get_data_search_videos
+from tiktok import  get_data, get_username_profile, get_username_posts, get_socialmedia_value, get_socialvalue_cpv, get_socialvalue, post_data, post_data_campaign, get_data_search, get_data_search_users, get_data_search_videos, post_data_create_campaign
 from instagram import create_update_task_ig, get_task_update_profile_data_ig, get_profile_data_ig, get_feed_posts_data_ig, create_update_task_location, get_task_update_location_data_ig, get_location_data_ig
 
 dict_data_campaign = []
@@ -228,8 +228,6 @@ if a == 'Tiktok':
     if search_btn:
         print(hashtag)
         usernames_campaign.append(hashtag)
-        usernames = st.multiselect(
-                'What are your favorite colors',usernames_campaign)
         st.title('Search')
         st.write(get_data_search(hashtag))
         st.title('Users')
@@ -890,7 +888,108 @@ if a == 'Tiktok':
                     
 if a == 'Crear Campaña':   
     results_table = pd.read_sql(query, engine)
+    campaign_name = st.text_input('Nombre de la campaña', value = "")
+    budget = st.text_input('Presupuesto', value = "")
     options = st.multiselect('Selecciona los influencers para tu campaña', results_table['username'])
     btn_analize = st.button('Analizar')
     if btn_analize:
-        st.write(options)
+        min_views = results_table[results_table['username'].isin(options)]['min_video_plays'].sum()
+        max_views = results_table[results_table['username'].isin(options)]['max_video_plays'].sum()
+        avg_views = results_table[results_table['username'].isin(options)]['median_video_plays'].sum()
+        amount_to_pay = results_table[results_table['username'].isin(options)]['estimated_post_rate'].sum()
+        total_followers = results_table[results_table['username'].isin(options)]['followers'].sum()
+        payment_amount = avg_views*0.01
+        profit = int(budget) - amount_to_pay
+        profit_margin = profit / int(budget)
+        dict_save = {
+            'campaign_name':campaign_name,
+            'budget': budget,
+            'tiktokers':options,
+            'predicted_min_views': min_views,
+            'predicted_avg_views': avg_views,
+            'predicted_max_views': max_views,
+            'estimated_amount_to_pay': amount_to_pay,
+            'total_followers': total_followers,
+            'estimated_revenue': payment_amount
+        }
+
+        st.title('Prónostico campaña')
+        colr1, colr2, colr3 = st.columns(3)
+        colr1.metric('Minimo Vistas Esperadas:', min_views)
+        colr2.metric('Vistas Esperadas:', avg_views)
+        colr3.metric('Maximo Visitas Esperadas:', max_views)
+        colr1.metric('Total Followers:', total_followers)
+        colr2.metric('Expected Amount to Pay:', "{:.2f}".format(amount_to_pay))
+        colr3.metric('Profit Margin:', "{:.2f}".format(profit_margin*100) + '%')
+        st.title('Los Tiktokers')
+        colt1, colt2 = st.columns(2)
+        st.title('Posts Recientes')
+        colp1, colp2, colp3, colp4 = st.columns(4)
+        df = results_table[results_table['username'].isin(options)]
+        for index, row in df.iterrows():
+            if index%2==0:
+                try:
+                    colt1.image(row['avatar'])
+                except:
+                    continue
+                colt1.write(row['username'])
+                colt1.metric('Followers:', row['followers'])
+                colt1.metric('Estimated post cost:', '$ ' +  str(round(row['estimated_post_rate'],2)))
+            if index%2==1:
+                try:
+                    colt2.image(row['avatar'])
+                except:
+                    continue
+                colt2.write(row['username'])
+                colt2.metric('Followers:', row['followers'])
+                colt2.metric('Estimated post cost:', '$ ' + str(round(row['estimated_post_rate'],2)))
+            dict_posts = get_username_posts(row['secuid'])
+            dict_videos = dict_posts['itemList']
+            if 'itemList' not in dict_posts:
+                colp1.write(f"No se encontraron publicaciones con el hashtag {row['username']}")
+            else:
+                dict_videos = dict_posts['itemList']
+                count = 0
+                hashtags_user_list = []
+                related_users_list = []
+                for k in dict_videos:
+                    stats = k['stats']
+                    authorStats = k['authorStats']
+                    videoInfo = k['video']
+                    date = datetime.datetime.fromtimestamp(k['createTime'])
+                    date_str = date.strftime('%Y-%m-%d %H:%M:%S')
+                    if count < 4:
+                        if count%4 == 0:
+                            colp1.video(videoInfo['playAddr'])
+                            colp1.write('Fecha Publicación: ' + date_str)
+                            colp1.write('por @' + k['author']['uniqueId'])
+                            colp1.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                            colp1.write('▶️ ' + "{:,}".format(stats['playCount']))
+                            colp1.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                        if count%4 == 1:
+                            colp2.video(videoInfo['playAddr'])
+                            colp2.write('Fecha Publicación: ' + date_str)
+                            colp2.write('por @' + k['author']['uniqueId'])
+                            colp2.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                            colp2.write('▶️ ' + "{:,}".format(stats['playCount']))
+                            colp2.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                        if count%4 == 2:
+                            colp3.video(videoInfo['playAddr'])
+                            colp3.write('Fecha Publicación: ' + date_str)
+                            colp3.write('por @' + k['author']['uniqueId'])
+                            colp3.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                            colp3.write('▶️ ' + "{:,}".format(stats['playCount']))
+                            colp3.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                        if count%4 == 3:
+                            colp4.video(videoInfo['playAddr'])
+                            colp4.write('Fecha Publicación: ' + date_str)
+                            colp4.write('por @' + k['author']['uniqueId'])
+                            colp4.write('❤️ ' + "{:,}".format(stats['diggCount']))
+                            colp4.write('▶️ ' + "{:,}".format(stats['playCount']))
+                            colp4.write('💬 ' + "{:,}".format(stats['shareCount'] + stats['commentCount']))
+                    count = count + 1 
+        post_data_create_campaign(dict_save)
+        
+
+
+

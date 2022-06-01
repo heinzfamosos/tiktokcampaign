@@ -43,6 +43,52 @@ def get_data(hashtag):
     tiktok_data = json.loads(json_string)
     return tiktok_data
 
+def get_data_search(keywords):
+    conn = http.client.HTTPSConnection("api.tikapi.io")
+    payload = ''
+    headers = {
+    'X-API-KEY': '56ONwxSEmceiI9b27WsP8Ai3bfRPSlqD'
+    }
+    req_text = "/public/search/general?query=" + keywords
+    conn.request("GET", req_text, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data)
+    json_string = data.decode("utf-8")
+    tiktok_data = json.loads(json_string)
+    return tiktok_data
+
+def get_data_search_users(keywords):
+    conn = http.client.HTTPSConnection("api.tikapi.io")
+    payload = ''
+    headers = {
+    'X-API-KEY': '56ONwxSEmceiI9b27WsP8Ai3bfRPSlqD'
+    }
+    req_text = "/public/search/users?query=" + keywords
+    conn.request("GET", req_text, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data)
+    json_string = data.decode("utf-8")
+    tiktok_data = json.loads(json_string)
+    return tiktok_data
+
+def get_data_search_videos(keywords):
+    conn = http.client.HTTPSConnection("api.tikapi.io")
+    payload = ''
+    headers = {
+    'X-API-KEY': '56ONwxSEmceiI9b27WsP8Ai3bfRPSlqD'
+    }
+    req_text = "/public/search/videos?query=" + keywords
+    conn.request("GET", req_text, payload, headers)
+    res = conn.getresponse()
+    data = res.read()
+    print(data)
+    json_string = data.decode("utf-8")
+    tiktok_data = json.loads(json_string)
+    return tiktok_data
+
+
 def get_username_profile(username):
     conn = http.client.HTTPSConnection("api.tikapi.io")
     payload = ''
@@ -167,6 +213,20 @@ def post_data_campaign(data):
     'Content-Type': 'application/json'
   }
   conn.request("POST", "/hooks/catch/7655196/bfhgb15/", payload, headers)
+  res = conn.getresponse()
+  data = res.read()
+  json_string = data.decode("utf-8")
+  tiktok_data = json.loads(json_string)
+  return tiktok_data
+
+def post_data_create_campaign(data):
+  conn = http.client.HTTPSConnection("hooks.zapier.com")
+  payload = json.dumps(data, cls=NpEncoder)
+  headers = {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  }
+  conn.request("POST", "/hooks/catch/7655196/bfjzjpn/", payload, headers)
   res = conn.getresponse()
   data = res.read()
   json_string = data.decode("utf-8")
